@@ -10,8 +10,9 @@ import { useAuthStore } from '../store/authStore';
 const navItems = [
   { to: '/dashboard', icon: BarChart3, labelKey: 'dashboard' },
   { to: '/tournaments', icon: CalendarRange, labelKey: 'tournaments' },
+  { to: '/teams', icon: UsersRound, labelKey: 'teams' },
   { to: '/users', icon: UserCog, labelKey: 'users' },
-  { to: '/public', icon: UsersRound, labelKey: 'publicPortal' },
+  { to: '/public', icon: Shield, labelKey: 'publicPortal' },
 ];
 
 export function AdminLayout() {

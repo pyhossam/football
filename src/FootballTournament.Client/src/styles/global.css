@@ -721,6 +721,63 @@ input {
   color: var(--green-700);
 }
 
+.color-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-block-start: 16px;
+}
+
+.team-panel {
+  --team-primary: var(--green-700);
+  --team-secondary: var(--gold-500);
+  min-height: 150px;
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(20, 33, 27, 0.08);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--team-primary) 10%, #ffffff), #ffffff),
+    #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.team-panel::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  height: 7px;
+  background: linear-gradient(90deg, var(--team-primary), var(--team-secondary));
+}
+
+.team-panel__crest {
+  width: 78px;
+  height: 78px;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  border-radius: 8px;
+  color: #fff;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--team-secondary) 52%, transparent), transparent),
+    var(--team-primary);
+}
+
+.team-panel .status-pill {
+  grid-column: 1 / -1;
+}
+
 .wizard-shell {
   padding: clamp(16px, 3vw, 28px);
   display: grid;
@@ -938,7 +995,8 @@ input {
   .page-header--row,
   .tournament-card,
   .tournament-card__header,
-  .user-row {
+  .user-row,
+  .team-panel {
     grid-template-columns: 1fr;
     align-items: flex-start;
   }
@@ -1003,7 +1061,9 @@ input {
 
   .public-grid,
   .stat-grid,
-  .form-grid {
+  .form-grid,
+  .team-grid,
+  .color-row {
     grid-template-columns: 1fr;
   }
 

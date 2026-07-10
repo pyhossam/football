@@ -87,6 +87,7 @@ Frontend:
 - Public portal: `http://localhost:5173/public`
 - Dashboard: `http://localhost:5173/dashboard`
 - Users: `http://localhost:5173/users`
+- Teams: `http://localhost:5173/teams`
 - Create tournament: `http://localhost:5173/tournaments/new`
 
 Development admin login:

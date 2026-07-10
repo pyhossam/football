@@ -17,6 +17,8 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
     public DbSet<TournamentSupervisor> TournamentSupervisors => Set<TournamentSupervisor>();
 
+    public DbSet<Team> Teams => Set<Team>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

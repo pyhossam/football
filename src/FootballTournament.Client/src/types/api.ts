@@ -80,3 +80,35 @@ export type CreateUserRequest = {
   fullName?: string | null;
   role: AppRole;
 };
+
+export type Team = {
+  id: string;
+  tournamentId: string;
+  nameAr: string;
+  nameEn: string;
+  shortName: string;
+  teamCode: string;
+  primaryColor: string;
+  secondaryColor: string;
+  city: string | null;
+  country: string | null;
+  teamManagerUserId: string | null;
+  approvalStatus: number;
+  registrationStatus: number;
+  isActive: boolean;
+  createdAt: string;
+};
+
+export type CreateTeamRequest = {
+  nameAr: string;
+  nameEn: string;
+  shortName: string;
+  teamCode: string;
+  primaryColor: string;
+  secondaryColor: string;
+  city?: string | null;
+  country?: string | null;
+  foundationDate?: string | null;
+  description?: string | null;
+  teamManagerUserId?: string | null;
+};

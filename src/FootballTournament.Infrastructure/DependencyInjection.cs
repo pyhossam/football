@@ -1,5 +1,6 @@
 using FootballTournament.Application.Auth;
 using FootballTournament.Application.Tournaments;
+using FootballTournament.Application.Teams;
 using FootballTournament.Application.Users;
 using FootballTournament.Domain.Constants;
 using FootballTournament.Infrastructure.Identity;
@@ -64,6 +65,7 @@ public static class DependencyInjection
         services.AddAuthorization(ConfigureAuthorization);
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITournamentService, TournamentService>();
+        services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<IUserManagementService, UserManagementService>();
         services.AddScoped<DatabaseSeeder>();
 
