@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+.idea/
+.vscode/
+logs/
+*.user
+*.suo
+*.db
+*.sqlite
+.env
+node_modules/
+dist/
+coverage/
+TestResults/
