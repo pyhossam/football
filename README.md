@@ -1,6 +1,6 @@
 # Football Tournament Management Platform
 
-Backend foundation for a football tournament management platform using ASP.NET Core, Clean Architecture, PostgreSQL, Identity, JWT access tokens, refresh-token rotation, role policies, Swagger, FluentValidation, AutoMapper, Serilog, EF Core migrations, and xUnit tests.
+Football tournament management platform using ASP.NET Core, Clean Architecture, PostgreSQL, Identity, JWT access tokens, refresh-token rotation, role policies, Swagger, FluentValidation, AutoMapper, Serilog, EF Core migrations, React, TypeScript, Material UI, React Query, Zustand, and xUnit tests.
 
 ## Current Phase
 
@@ -18,13 +18,18 @@ Implemented first backend phase:
 - Swagger/OpenAPI
 - Arabic/English localization pipeline with RTL-ready culture support for frontend integration
 - Docker Compose for API + PostgreSQL
+- React TypeScript client foundation with Arabic/English language switching
+- RTL/LTR layout support
+- Responsive login, public portal, dashboard, and tournaments pages
+- Sports-themed visual identity with mobile and tablet layouts
 
 ## Requirements
 
 - .NET SDK 10
+- Node.js 24 or compatible runtime with pnpm
 - Docker Desktop for containerized PostgreSQL/API
 
-Node/npm is not currently installed in this machine, so the React frontend phase is intentionally deferred until the backend foundation is stable.
+Codex desktop can use its bundled Node.js and pnpm runtime when Node is not installed globally.
 
 ## Configuration
 
@@ -54,6 +59,7 @@ API:
 
 - Swagger: `http://localhost:5080/swagger`
 - Health: `http://localhost:5080/health`
+- Frontend: `http://localhost:5173`
 
 ## Run Locally
 
@@ -63,6 +69,27 @@ Start PostgreSQL, then set the required environment variables and run:
 dotnet restore .\FootballTournament.sln
 dotnet ef database update --project .\src\FootballTournament.Infrastructure\FootballTournament.Infrastructure.csproj --startup-project .\src\FootballTournament.Api\FootballTournament.Api.csproj
 dotnet run --project .\src\FootballTournament.Api\FootballTournament.Api.csproj
+```
+
+Run the frontend:
+
+```powershell
+cd .\src\FootballTournament.Client
+pnpm install
+pnpm run dev
+```
+
+Frontend:
+
+- App: `http://localhost:5173`
+- Login: `http://localhost:5173/login`
+- Public portal: `http://localhost:5173/public`
+
+Development admin login:
+
+```text
+admin@football.local
+Admin@123
 ```
 
 ## Main API Routes
@@ -81,6 +108,8 @@ dotnet run --project .\src\FootballTournament.Api\FootballTournament.Api.csproj
 
 ```powershell
 dotnet test .\FootballTournament.sln
+cd .\src\FootballTournament.Client
+pnpm run build
 ```
 
 ## GitHub Remote
