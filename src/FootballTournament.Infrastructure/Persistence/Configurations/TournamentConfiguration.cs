@@ -18,7 +18,9 @@ internal sealed class TournamentConfiguration : IEntityTypeConfiguration<Tournam
         builder.Property(x => x.Country).HasMaxLength(120);
         builder.Property(x => x.City).HasMaxLength(120);
         builder.Property(x => x.Location).HasMaxLength(250);
-        builder.Property(x => x.RowVersion).IsRowVersion();
+        builder.Property(x => x.RowVersion)
+            .HasDefaultValue(Array.Empty<byte>())
+            .IsConcurrencyToken();
         builder.HasIndex(x => x.Slug).IsUnique();
         builder.HasIndex(x => x.TournamentCode).IsUnique();
         builder.HasIndex(x => x.Status);

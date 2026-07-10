@@ -11,7 +11,9 @@ internal sealed class TournamentSupervisorConfiguration : IEntityTypeConfigurati
     {
         builder.ToTable("TournamentSupervisors");
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.RowVersion).IsRowVersion();
+        builder.Property(x => x.RowVersion)
+            .HasDefaultValue(Array.Empty<byte>())
+            .IsConcurrencyToken();
         builder.HasIndex(x => new { x.TournamentId, x.UserId }).IsUnique();
         builder.HasQueryFilter(x => !x.IsDeleted);
         builder.HasOne(x => x.Tournament)

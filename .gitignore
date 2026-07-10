@@ -9,6 +9,7 @@ logs/
 *.db
 *.sqlite
 .env
+passConfig.txt
 node_modules/
 dist/
 coverage/
