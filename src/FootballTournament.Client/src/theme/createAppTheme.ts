@@ -32,7 +32,7 @@ export function createAppTheme(direction: 'rtl' | 'ltr') {
     typography: {
       fontFamily:
         direction === 'rtl'
-          ? '"Segoe UI", Tahoma, Arial, sans-serif'
+          ? '"Cairo", "Segoe UI", Tahoma, Arial, sans-serif'
           : 'Inter, "Segoe UI", Arial, sans-serif',
       h1: {
         fontWeight: 900,

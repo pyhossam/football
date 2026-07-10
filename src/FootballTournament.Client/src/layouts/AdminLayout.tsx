@@ -1,5 +1,5 @@
 import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material';
-import { BarChart3, CalendarRange, LogOut, Menu, Shield, UsersRound } from 'lucide-react';
+import { BarChart3, CalendarRange, LogOut, Menu, Shield, UserCog, UsersRound } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { useAuthStore } from '../store/authStore';
 const navItems = [
   { to: '/dashboard', icon: BarChart3, labelKey: 'dashboard' },
   { to: '/tournaments', icon: CalendarRange, labelKey: 'tournaments' },
+  { to: '/users', icon: UserCog, labelKey: 'users' },
   { to: '/public', icon: UsersRound, labelKey: 'publicPortal' },
 ];
 

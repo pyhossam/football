@@ -1,5 +1,6 @@
 using FootballTournament.Application.Auth;
 using FootballTournament.Application.Tournaments;
+using FootballTournament.Application.Users;
 using FootballTournament.Domain.Constants;
 using FootballTournament.Infrastructure.Identity;
 using FootballTournament.Infrastructure.Persistence;
@@ -38,7 +39,12 @@ public static class DependencyInjection
             .AddDefaultTokenProviders();
 
         var jwt = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
             .AddJwtBearer(options =>
             {
                 options.RequireHttpsMetadata = true;
@@ -58,6 +64,7 @@ public static class DependencyInjection
         services.AddAuthorization(ConfigureAuthorization);
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITournamentService, TournamentService>();
+        services.AddScoped<IUserManagementService, UserManagementService>();
         services.AddScoped<DatabaseSeeder>();
 
         return services;

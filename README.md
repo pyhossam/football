@@ -22,6 +22,7 @@ Implemented first backend phase:
 - RTL/LTR layout support
 - Responsive login, public portal, dashboard, and tournaments pages
 - Sports-themed visual identity with mobile and tablet layouts
+- Professional Arabic UI font using Cairo with system fallbacks
 
 ## Requirements
 
@@ -84,6 +85,9 @@ Frontend:
 - App: `http://localhost:5173`
 - Login: `http://localhost:5173/login`
 - Public portal: `http://localhost:5173/public`
+- Dashboard: `http://localhost:5173/dashboard`
+- Users: `http://localhost:5173/users`
+- Create tournament: `http://localhost:5173/tournaments/new`
 
 Development admin login:
 

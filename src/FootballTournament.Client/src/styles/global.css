@@ -1,4 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap");
+
 :root {
+  font-family: "Cairo", "Segoe UI", Tahoma, Arial, sans-serif;
   color: #14211b;
   background: #f4f7f2;
   font-synthesis: none;
@@ -651,6 +654,142 @@ input {
   gap: 14px;
 }
 
+.management-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.22fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.form-panel,
+.list-panel,
+.wizard-shell {
+  border: 1px solid rgba(20, 33, 27, 0.1);
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 8px;
+  box-shadow: 0 20px 55px rgba(12, 41, 32, 0.1);
+}
+
+.form-panel,
+.list-panel {
+  padding: 20px;
+}
+
+.form-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.user-list {
+  display: grid;
+  gap: 10px;
+  margin-block-start: 16px;
+}
+
+.user-row {
+  min-height: 74px;
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f6faf7;
+  border: 1px solid rgba(20, 33, 27, 0.07);
+}
+
+.user-row__avatar {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 900;
+  background:
+    linear-gradient(145deg, rgba(214, 165, 54, 0.9), rgba(214, 165, 54, 0.18)),
+    var(--green-700);
+}
+
+.user-row__roles {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--green-700);
+}
+
+.wizard-shell {
+  padding: clamp(16px, 3vw, 28px);
+  display: grid;
+  gap: 28px;
+}
+
+.wizard-form {
+  display: grid;
+  gap: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.review-card {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  border-radius: 8px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(6, 63, 51, 0.92), rgba(11, 107, 79, 0.82)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 34px, rgba(255, 255, 255, 0.09) 34px 68px);
+  overflow: hidden;
+  position: relative;
+}
+
+.review-card::before {
+  content: "";
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+}
+
+.review-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.review-card__meta {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.review-card__meta span {
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .tournament-card {
   display: grid;
   grid-template-columns: 74px minmax(0, 1fr) auto;
@@ -741,7 +880,8 @@ input {
   .login-page,
   .public-hero,
   .dashboard-grid,
-  .standings-panel {
+  .standings-panel,
+  .management-grid {
     grid-template-columns: 1fr;
   }
 
@@ -797,9 +937,14 @@ input {
 
   .page-header--row,
   .tournament-card,
-  .tournament-card__header {
+  .tournament-card__header,
+  .user-row {
     grid-template-columns: 1fr;
     align-items: flex-start;
+  }
+
+  .user-row__roles {
+    justify-content: flex-start;
   }
 
   .tournament-card {
@@ -857,7 +1002,8 @@ input {
   }
 
   .public-grid,
-  .stat-grid {
+  .stat-grid,
+  .form-grid {
     grid-template-columns: 1fr;
   }
 

@@ -6,7 +6,9 @@ import { AccessDeniedPage } from '../pages/AccessDeniedPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { LoginPage } from '../pages/LoginPage';
 import { PublicHomePage } from '../pages/PublicHomePage';
+import { CreateTournamentPage } from '../pages/CreateTournamentPage';
 import { TournamentsPage } from '../pages/TournamentsPage';
+import { UsersPage } from '../pages/UsersPage';
 import { ProtectedRoute } from './ProtectedRoute';
 
 export function AppRoutes() {
@@ -29,6 +31,8 @@ export function AppRoutes() {
       >
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/tournaments" element={<TournamentsPage />} />
+        <Route path="/tournaments/new" element={<CreateTournamentPage />} />
+        <Route path="/users" element={<UsersPage />} />
       </Route>
 
       <Route path="/access-denied" element={<AccessDeniedPage />} />

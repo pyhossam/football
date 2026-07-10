@@ -10,9 +10,13 @@ const resources = {
       logout: 'تسجيل الخروج',
       email: 'البريد الإلكتروني',
       password: 'كلمة المرور',
+      fullName: 'الاسم الكامل',
       publicPortal: 'البوابة العامة',
       dashboard: 'لوحة التحكم',
       tournaments: 'البطولات',
+      createTournament: 'إنشاء بطولة',
+      users: 'المستخدمون',
+      userManagement: 'إدارة المستخدمين',
       teams: 'الفرق',
       players: 'اللاعبون',
       reports: 'التقارير',
@@ -54,6 +58,32 @@ const resources = {
       apiOnline: 'الخدمة متصلة',
       apiOffline: 'الخدمة غير متصلة',
       role: 'الدور',
+      roleGeneralAdmin: 'مدير عام',
+      roleTournamentSupervisor: 'مشرف بطولة',
+      roleTeamManager: 'مدير فريق',
+      createUser: 'إضافة مستخدم',
+      save: 'حفظ',
+      saving: 'جاري الحفظ',
+      basicInfo: 'المعلومات الأساسية',
+      rules: 'القواعد',
+      review: 'المراجعة',
+      nameAr: 'اسم البطولة بالعربية',
+      nameEn: 'اسم البطولة بالإنجليزية',
+      slug: 'الرابط المختصر',
+      tournamentCode: 'كود البطولة',
+      startDate: 'تاريخ البداية',
+      endDate: 'تاريخ النهاية',
+      maximumTeams: 'الحد الأقصى للفرق',
+      minimumPlayers: 'أقل عدد لاعبين',
+      maximumPlayers: 'أقصى عدد لاعبين',
+      country: 'الدولة',
+      city: 'المدينة',
+      location: 'الموقع',
+      format: 'نظام البطولة',
+      create: 'إنشاء',
+      createdSuccessfully: 'تم الإنشاء بنجاح',
+      userCreated: 'تم إنشاء المستخدم',
+      wizardHint: 'خطوات مركزة لإنشاء بطولة قابلة للتوسع مع القواعد والجداول لاحقاً.',
     },
   },
   en: {
@@ -64,9 +94,13 @@ const resources = {
       logout: 'Sign out',
       email: 'Email',
       password: 'Password',
+      fullName: 'Full name',
       publicPortal: 'Public portal',
       dashboard: 'Dashboard',
       tournaments: 'Tournaments',
+      createTournament: 'Create tournament',
+      users: 'Users',
+      userManagement: 'User management',
       teams: 'Teams',
       players: 'Players',
       reports: 'Reports',
@@ -108,15 +142,52 @@ const resources = {
       apiOnline: 'API online',
       apiOffline: 'API offline',
       role: 'Role',
+      roleGeneralAdmin: 'General admin',
+      roleTournamentSupervisor: 'Tournament supervisor',
+      roleTeamManager: 'Team manager',
+      createUser: 'Add user',
+      save: 'Save',
+      saving: 'Saving',
+      basicInfo: 'Basic info',
+      rules: 'Rules',
+      review: 'Review',
+      nameAr: 'Arabic tournament name',
+      nameEn: 'English tournament name',
+      slug: 'Slug',
+      tournamentCode: 'Tournament code',
+      startDate: 'Start date',
+      endDate: 'End date',
+      maximumTeams: 'Maximum teams',
+      minimumPlayers: 'Minimum players',
+      maximumPlayers: 'Maximum players',
+      country: 'Country',
+      city: 'City',
+      location: 'Location',
+      format: 'Format',
+      create: 'Create',
+      createdSuccessfully: 'Created successfully',
+      userCreated: 'User created',
+      wizardHint: 'Focused steps for creating a tournament that can grow into rules and fixtures later.',
     },
   },
 };
 
+function getInitialLanguage() {
+  const stored = localStorage.getItem('football-language');
+  if (!stored) {
+    return 'ar';
+  }
+
+  try {
+    return JSON.parse(stored)?.state?.language || 'ar';
+  } catch {
+    return 'ar';
+  }
+}
+
 void i18n.use(initReactI18next).init({
   resources,
-  lng: localStorage.getItem('football-language')
-    ? JSON.parse(localStorage.getItem('football-language') || '{}')?.state?.language || 'ar'
-    : 'ar',
+  lng: getInitialLanguage(),
   fallbackLng: 'ar',
   interpolation: {
     escapeValue: false,

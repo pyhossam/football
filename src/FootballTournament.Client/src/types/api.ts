@@ -43,3 +43,40 @@ export type Tournament = {
   enablePublicVisibility: boolean;
   supervisorUserIds: string[];
 };
+
+export type CreateTournamentRequest = {
+  nameAr: string;
+  nameEn: string;
+  slug: string;
+  tournamentCode: string;
+  season: string;
+  startDate: string;
+  endDate: string;
+  maximumTeams: number;
+  minimumPlayersPerTeam: number;
+  maximumPlayersPerTeam: number;
+  format: number;
+  descriptionAr?: string | null;
+  descriptionEn?: string | null;
+  country?: string | null;
+  city?: string | null;
+  location?: string | null;
+};
+
+export type AppRole = 'GeneralAdmin' | 'TournamentSupervisor' | 'TeamManager';
+
+export type User = {
+  id: string;
+  email: string;
+  fullName: string | null;
+  isActive: boolean;
+  createdAt: string;
+  roles: string[];
+};
+
+export type CreateUserRequest = {
+  email: string;
+  password: string;
+  fullName?: string | null;
+  role: AppRole;
+};

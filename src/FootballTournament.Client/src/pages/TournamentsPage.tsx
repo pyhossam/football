@@ -1,7 +1,8 @@
 import { Alert, Box, Button, CircularProgress, Typography } from '@mui/material';
-import { RefreshCcw } from 'lucide-react';
+import { Plus, RefreshCcw } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { getTournaments } from '../api/tournamentsApi';
 import { TournamentCard } from '../components/TournamentCard';
 
@@ -21,9 +22,14 @@ export function TournamentsPage() {
             {t('appSubtitle')}
           </Typography>
         </Box>
-        <Button variant="contained" onClick={() => void refetch()} startIcon={<RefreshCcw size={18} />}>
-          {isFetching ? <CircularProgress color="inherit" size={18} /> : t('refresh')}
-        </Button>
+        <Box className="nav-actions">
+          <Button component={Link} to="/tournaments/new" variant="contained" startIcon={<Plus size={18} />}>
+            {t('createTournament')}
+          </Button>
+          <Button variant="outlined" onClick={() => void refetch()} startIcon={<RefreshCcw size={18} />}>
+            {isFetching ? <CircularProgress color="inherit" size={18} /> : t('refresh')}
+          </Button>
+        </Box>
       </Box>
 
       {error && <Alert severity="error">{error instanceof Error ? error.message : 'Error'}</Alert>}
