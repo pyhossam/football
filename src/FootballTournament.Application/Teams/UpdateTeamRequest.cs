@@ -6,6 +6,7 @@ public sealed record UpdateTeamRequest(
     string NameAr,
     string NameEn,
     string ShortName,
+    string? LogoPath,
     string PrimaryColor,
     string SecondaryColor,
     string? City,

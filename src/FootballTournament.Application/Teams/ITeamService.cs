@@ -8,9 +8,19 @@ public interface ITeamService
 
     Task<TeamDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
-    Task<TeamDto> CreateAsync(Guid tournamentId, CreateTeamRequest request, string? userId, CancellationToken cancellationToken);
+    Task<TeamDto> CreateAsync(
+        Guid tournamentId,
+        CreateTeamRequest request,
+        string? userId,
+        bool restrictToAssigned,
+        CancellationToken cancellationToken);
 
-    Task<TeamDto?> UpdateAsync(Guid id, UpdateTeamRequest request, string? userId, CancellationToken cancellationToken);
+    Task<TeamDto?> UpdateAsync(
+        Guid id,
+        UpdateTeamRequest request,
+        string? userId,
+        bool restrictToAssigned,
+        CancellationToken cancellationToken);
 
-    Task<bool> ArchiveAsync(Guid id, string? userId, CancellationToken cancellationToken);
+    Task<bool> ArchiveAsync(Guid id, string? userId, bool restrictToAssigned, CancellationToken cancellationToken);
 }

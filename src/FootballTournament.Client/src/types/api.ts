@@ -31,8 +31,13 @@ export type Tournament = {
   nameAr: string;
   nameEn: string;
   slug: string;
+  descriptionAr: string | null;
+  descriptionEn: string | null;
   tournamentCode: string;
   season: string;
+  country: string | null;
+  city: string | null;
+  location: string | null;
   startDate: string;
   endDate: string;
   maximumTeams: number;
@@ -42,6 +47,13 @@ export type Tournament = {
   status: number;
   enablePublicVisibility: boolean;
   supervisorUserIds: string[];
+  supervisors: TournamentSupervisor[];
+};
+
+export type TournamentSupervisor = {
+  userId: string;
+  fullName: string | null;
+  email: string | null;
 };
 
 export type CreateTournamentRequest = {
@@ -61,6 +73,11 @@ export type CreateTournamentRequest = {
   country?: string | null;
   city?: string | null;
   location?: string | null;
+};
+
+export type UpdateTournamentRequest = CreateTournamentRequest & {
+  status: number;
+  enablePublicVisibility: boolean;
 };
 
 export type AppRole = 'GeneralAdmin' | 'TournamentSupervisor' | 'TeamManager';
@@ -88,10 +105,13 @@ export type Team = {
   nameEn: string;
   shortName: string;
   teamCode: string;
+  logoPath: string | null;
   primaryColor: string;
   secondaryColor: string;
   city: string | null;
   country: string | null;
+  foundationDate: string | null;
+  description: string | null;
   teamManagerUserId: string | null;
   approvalStatus: number;
   registrationStatus: number;
@@ -104,6 +124,7 @@ export type CreateTeamRequest = {
   nameEn: string;
   shortName: string;
   teamCode: string;
+  logoPath?: string | null;
   primaryColor: string;
   secondaryColor: string;
   city?: string | null;
@@ -111,4 +132,10 @@ export type CreateTeamRequest = {
   foundationDate?: string | null;
   description?: string | null;
   teamManagerUserId?: string | null;
+};
+
+export type UpdateTeamRequest = Omit<CreateTeamRequest, 'teamCode'> & {
+  approvalStatus: number;
+  registrationStatus: number;
+  isActive: boolean;
 };

@@ -21,6 +21,7 @@ export function AdminLayout() {
   const auth = useAuthStore((state) => state.auth);
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
+  const visibleNavItems = navItems.filter((item) => item.to !== '/users' || auth?.roles.includes('GeneralAdmin'));
 
   function handleLogout() {
     logout();
@@ -32,7 +33,7 @@ export function AdminLayout() {
       <Box className={`admin-sidebar ${open ? 'admin-sidebar--open' : ''}`}>
         <BrandMark />
         <Box className="admin-sidebar__nav">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             return (
               <NavLink key={item.to} to={item.to} className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}>

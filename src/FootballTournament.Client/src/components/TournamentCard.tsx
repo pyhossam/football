@@ -1,6 +1,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import { CalendarDays, ShieldCheck, UsersRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../store/languageStore';
 import type { Tournament } from '../types/api';
 import { StatusPill } from './StatusPill';
@@ -44,8 +45,8 @@ export function TournamentCard({ tournament }: TournamentCardProps) {
           </span>
         </Box>
       </Box>
-      <Button variant="outlined" size="small">
-        {t('matchCenter')}
+      <Button component={Link} to={`/tournaments/${tournament.id}`} variant="outlined" size="small">
+        {t('details')}
       </Button>
     </Box>
   );

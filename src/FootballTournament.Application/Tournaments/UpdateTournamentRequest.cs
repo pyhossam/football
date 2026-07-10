@@ -6,6 +6,7 @@ public sealed record UpdateTournamentRequest(
     string NameAr,
     string NameEn,
     string Slug,
+    string TournamentCode,
     string Season,
     DateOnly StartDate,
     DateOnly EndDate,

@@ -50,12 +50,22 @@ public sealed class TeamService(ApplicationDbContext dbContext) : ITeamService
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<TeamDto> CreateAsync(Guid tournamentId, CreateTeamRequest request, string? userId, CancellationToken cancellationToken)
+    public async Task<TeamDto> CreateAsync(
+        Guid tournamentId,
+        CreateTeamRequest request,
+        string? userId,
+        bool restrictToAssigned,
+        CancellationToken cancellationToken)
     {
         var tournamentExists = await dbContext.Tournaments.AnyAsync(x => x.Id == tournamentId, cancellationToken);
         if (!tournamentExists)
         {
             throw new DomainException("Tournament was not found.");
+        }
+
+        if (restrictToAssigned && !await IsAssignedSupervisorAsync(tournamentId, userId, cancellationToken))
+        {
+            throw new DomainException("You cannot manage teams for this tournament.");
         }
 
         var duplicate = await dbContext.Teams.AnyAsync(x =>
@@ -75,6 +85,7 @@ public sealed class TeamService(ApplicationDbContext dbContext) : ITeamService
             NameEn = request.NameEn.Trim(),
             ShortName = request.ShortName.Trim(),
             TeamCode = request.TeamCode.Trim().ToUpperInvariant(),
+            LogoPath = request.LogoPath,
             PrimaryColor = request.PrimaryColor,
             SecondaryColor = request.SecondaryColor,
             City = request.City,
@@ -90,10 +101,20 @@ public sealed class TeamService(ApplicationDbContext dbContext) : ITeamService
         return ToDto(team);
     }
 
-    public async Task<TeamDto?> UpdateAsync(Guid id, UpdateTeamRequest request, string? userId, CancellationToken cancellationToken)
+    public async Task<TeamDto?> UpdateAsync(
+        Guid id,
+        UpdateTeamRequest request,
+        string? userId,
+        bool restrictToAssigned,
+        CancellationToken cancellationToken)
     {
         var team = await dbContext.Teams.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (team is null)
+        {
+            return null;
+        }
+
+        if (restrictToAssigned && !await IsAssignedSupervisorAsync(team.TournamentId, userId, cancellationToken))
         {
             return null;
         }
@@ -112,6 +133,7 @@ public sealed class TeamService(ApplicationDbContext dbContext) : ITeamService
         team.NameAr = request.NameAr.Trim();
         team.NameEn = request.NameEn.Trim();
         team.ShortName = request.ShortName.Trim();
+        team.LogoPath = request.LogoPath;
         team.PrimaryColor = request.PrimaryColor;
         team.SecondaryColor = request.SecondaryColor;
         team.City = request.City;
@@ -129,10 +151,15 @@ public sealed class TeamService(ApplicationDbContext dbContext) : ITeamService
         return ToDto(team);
     }
 
-    public async Task<bool> ArchiveAsync(Guid id, string? userId, CancellationToken cancellationToken)
+    public async Task<bool> ArchiveAsync(Guid id, string? userId, bool restrictToAssigned, CancellationToken cancellationToken)
     {
         var team = await dbContext.Teams.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (team is null)
+        {
+            return false;
+        }
+
+        if (restrictToAssigned && !await IsAssignedSupervisorAsync(team.TournamentId, userId, cancellationToken))
         {
             return false;
         }
@@ -152,13 +179,24 @@ public sealed class TeamService(ApplicationDbContext dbContext) : ITeamService
             team.NameEn,
             team.ShortName,
             team.TeamCode,
+            team.LogoPath,
             team.PrimaryColor,
             team.SecondaryColor,
             team.City,
             team.Country,
+            team.FoundationDate,
+            team.Description,
             team.TeamManagerUserId,
             team.ApprovalStatus,
             team.RegistrationStatus,
             team.IsActive,
             team.CreatedAt);
+
+    private async Task<bool> IsAssignedSupervisorAsync(Guid tournamentId, string? userId, CancellationToken cancellationToken)
+    {
+        return Guid.TryParse(userId, out var parsedUserId) &&
+            await dbContext.TournamentSupervisors.AnyAsync(
+                x => x.TournamentId == tournamentId && x.UserId == parsedUserId,
+                cancellationToken);
+    }
 }

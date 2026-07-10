@@ -8,6 +8,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { PublicHomePage } from '../pages/PublicHomePage';
 import { CreateTournamentPage } from '../pages/CreateTournamentPage';
 import { TournamentsPage } from '../pages/TournamentsPage';
+import { TournamentDetailsPage } from '../pages/TournamentDetailsPage';
 import { UsersPage } from '../pages/UsersPage';
 import { TeamsPage } from '../pages/TeamsPage';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -33,6 +34,7 @@ export function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/tournaments" element={<TournamentsPage />} />
         <Route path="/tournaments/new" element={<CreateTournamentPage />} />
+        <Route path="/tournaments/:id" element={<TournamentDetailsPage />} />
         <Route path="/teams" element={<TeamsPage />} />
         <Route path="/users" element={<UsersPage />} />
       </Route>

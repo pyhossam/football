@@ -1,20 +1,24 @@
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using FootballTournament.Application.Common;
 using FootballTournament.Application.Tournaments;
 using FootballTournament.Domain.Entities;
 using FootballTournament.Domain.Exceptions;
+using FootballTournament.Infrastructure.Identity;
 using FootballTournament.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace FootballTournament.Infrastructure.Services;
 
-public sealed class TournamentService(ApplicationDbContext dbContext, IMapper mapper) : ITournamentService
+public sealed class TournamentService(ApplicationDbContext dbContext) : ITournamentService
 {
-    public async Task<PagedResult<TournamentDto>> GetAsync(TournamentQuery query, CancellationToken cancellationToken)
+    public async Task<PagedResult<TournamentDto>> GetAsync(
+        TournamentQuery query,
+        string? userId,
+        bool restrictToAssigned,
+        CancellationToken cancellationToken)
     {
         var pageNumber = Math.Max(query.PageNumber, 1);
         var pageSize = Math.Clamp(query.PageSize, 1, 100);
+        var currentUserId = ParseUserId(userId);
 
         var tournaments = dbContext.Tournaments
             .AsNoTracking()
@@ -29,6 +33,13 @@ public sealed class TournamentService(ApplicationDbContext dbContext, IMapper ma
                 .Include(x => x.Supervisors);
         }
 
+        if (restrictToAssigned)
+        {
+            tournaments = currentUserId.HasValue
+                ? tournaments.Where(x => x.Supervisors.Any(supervisor => supervisor.UserId == currentUserId.Value))
+                : tournaments.Where(_ => false);
+        }
+
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
             var search = query.Search.Trim().ToLowerInvariant();
@@ -40,24 +51,38 @@ public sealed class TournamentService(ApplicationDbContext dbContext, IMapper ma
         }
 
         var total = await tournaments.CountAsync(cancellationToken);
-        var items = await tournaments
+        var entities = await tournaments
             .OrderByDescending(x => x.CreatedAt)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .ProjectTo<TournamentDto>(mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
+        var users = await GetSupervisorUsersAsync(entities, cancellationToken);
+        var items = entities.Select(tournament => ToDto(tournament, users)).ToList();
 
         return new PagedResult<TournamentDto>(items, pageNumber, pageSize, total);
     }
 
-    public async Task<TournamentDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<TournamentDto?> GetByIdAsync(Guid id, string? userId, bool restrictToAssigned, CancellationToken cancellationToken)
     {
-        return await dbContext.Tournaments
+        var currentUserId = ParseUserId(userId);
+        var tournament = await dbContext.Tournaments
             .AsNoTracking()
             .Include(x => x.Supervisors)
             .Where(x => x.Id == id)
-            .ProjectTo<TournamentDto>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(cancellationToken);
+
+        if (tournament is null)
+        {
+            return null;
+        }
+
+        if (restrictToAssigned && (!currentUserId.HasValue || tournament.Supervisors.All(x => x.UserId != currentUserId.Value)))
+        {
+            return null;
+        }
+
+        var users = await GetSupervisorUsersAsync([tournament], cancellationToken);
+        return ToDto(tournament, users);
     }
 
     public async Task<TournamentDto> CreateAsync(CreateTournamentRequest request, string? userId, CancellationToken cancellationToken)
@@ -90,26 +115,40 @@ public sealed class TournamentService(ApplicationDbContext dbContext, IMapper ma
 
         dbContext.Tournaments.Add(tournament);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return mapper.Map<TournamentDto>(tournament);
+        return ToDto(tournament, new Dictionary<Guid, ApplicationUser>());
     }
 
-    public async Task<TournamentDto?> UpdateAsync(Guid id, UpdateTournamentRequest request, string? userId, CancellationToken cancellationToken)
+    public async Task<TournamentDto?> UpdateAsync(
+        Guid id,
+        UpdateTournamentRequest request,
+        string? userId,
+        bool restrictToAssigned,
+        CancellationToken cancellationToken)
     {
+        var currentUserId = ParseUserId(userId);
         var tournament = await dbContext.Tournaments.Include(x => x.Supervisors).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (tournament is null)
         {
             return null;
         }
 
-        var duplicate = await dbContext.Tournaments.AnyAsync(x => x.Id != id && x.Slug == request.Slug, cancellationToken);
+        if (restrictToAssigned && (!currentUserId.HasValue || tournament.Supervisors.All(x => x.UserId != currentUserId.Value)))
+        {
+            return null;
+        }
+
+        var duplicate = await dbContext.Tournaments.AnyAsync(
+            x => x.Id != id && (x.Slug == request.Slug || x.TournamentCode == request.TournamentCode),
+            cancellationToken);
         if (duplicate)
         {
-            throw new DomainException("Tournament slug already exists.");
+            throw new DomainException("Tournament slug or code already exists.");
         }
 
         tournament.NameAr = request.NameAr.Trim();
         tournament.NameEn = request.NameEn.Trim();
         tournament.Slug = request.Slug.Trim();
+        tournament.TournamentCode = request.TournamentCode.Trim();
         tournament.Season = request.Season.Trim();
         tournament.StartDate = request.StartDate;
         tournament.EndDate = request.EndDate;
@@ -128,7 +167,8 @@ public sealed class TournamentService(ApplicationDbContext dbContext, IMapper ma
         tournament.UpdatedBy = userId;
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return mapper.Map<TournamentDto>(tournament);
+        var users = await GetSupervisorUsersAsync([tournament], cancellationToken);
+        return ToDto(tournament, users);
     }
 
     public async Task<bool> ArchiveAsync(Guid id, string? userId, CancellationToken cancellationToken)
@@ -168,5 +208,65 @@ public sealed class TournamentService(ApplicationDbContext dbContext, IMapper ma
         });
         await dbContext.SaveChangesAsync(cancellationToken);
         return true;
+    }
+
+    private static Guid? ParseUserId(string? userId)
+    {
+        return Guid.TryParse(userId, out var parsed) ? parsed : null;
+    }
+
+    private async Task<Dictionary<Guid, ApplicationUser>> GetSupervisorUsersAsync(
+        IEnumerable<Tournament> tournaments,
+        CancellationToken cancellationToken)
+    {
+        var supervisorIds = tournaments
+            .SelectMany(x => x.Supervisors)
+            .Select(x => x.UserId)
+            .Distinct()
+            .ToArray();
+
+        if (supervisorIds.Length == 0)
+        {
+            return [];
+        }
+
+        return await dbContext.Users
+            .AsNoTracking()
+            .Where(x => supervisorIds.Contains(x.Id))
+            .ToDictionaryAsync(x => x.Id, cancellationToken);
+    }
+
+    private static TournamentDto ToDto(Tournament tournament, IReadOnlyDictionary<Guid, ApplicationUser> users)
+    {
+        var supervisors = tournament.Supervisors
+            .Select(supervisor =>
+            {
+                users.TryGetValue(supervisor.UserId, out var user);
+                return new TournamentSupervisorDto(supervisor.UserId, user?.FullName, user?.Email);
+            })
+            .ToArray();
+
+        return new TournamentDto(
+            tournament.Id,
+            tournament.NameAr,
+            tournament.NameEn,
+            tournament.Slug,
+            tournament.DescriptionAr,
+            tournament.DescriptionEn,
+            tournament.TournamentCode,
+            tournament.Season,
+            tournament.Country,
+            tournament.City,
+            tournament.Location,
+            tournament.StartDate,
+            tournament.EndDate,
+            tournament.MaximumTeams,
+            tournament.MinimumPlayersPerTeam,
+            tournament.MaximumPlayersPerTeam,
+            tournament.Format,
+            tournament.Status,
+            tournament.EnablePublicVisibility,
+            supervisors.Select(x => x.UserId).ToArray(),
+            supervisors);
     }
 }

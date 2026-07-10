@@ -46,7 +46,7 @@ public sealed class TeamsController(ITeamService teamService) : ControllerBase
             return BadRequest(ApiResponse<TeamDto>.Fail("Validation failed.", validation.ToDictionary()));
         }
 
-        var team = await teamService.CreateAsync(tournamentId, request, CurrentUserId(), cancellationToken);
+        var team = await teamService.CreateAsync(tournamentId, request, CurrentUserId(), RestrictToAssignedTournaments(), cancellationToken);
         return CreatedAtAction(nameof(GetById), new { id = team.Id }, ApiResponse<TeamDto>.Ok(team));
     }
 
@@ -64,7 +64,7 @@ public sealed class TeamsController(ITeamService teamService) : ControllerBase
             return BadRequest(ApiResponse<TeamDto>.Fail("Validation failed.", validation.ToDictionary()));
         }
 
-        var team = await teamService.UpdateAsync(id, request, CurrentUserId(), cancellationToken);
+        var team = await teamService.UpdateAsync(id, request, CurrentUserId(), RestrictToAssignedTournaments(), cancellationToken);
         return team is null
             ? NotFound(ApiResponse<TeamDto>.Fail("Team was not found."))
             : Ok(ApiResponse<TeamDto>.Ok(team));
@@ -74,9 +74,16 @@ public sealed class TeamsController(ITeamService teamService) : ControllerBase
     [Authorize(Policy = AppPolicies.ManageTournaments)]
     public async Task<IActionResult> Archive(Guid id, CancellationToken cancellationToken)
     {
-        var archived = await teamService.ArchiveAsync(id, CurrentUserId(), cancellationToken);
+        var archived = await teamService.ArchiveAsync(id, CurrentUserId(), RestrictToAssignedTournaments(), cancellationToken);
         return archived ? NoContent() : NotFound(ApiResponse<object>.Fail("Team was not found."));
     }
 
     private string? CurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    private bool RestrictToAssignedTournaments()
+    {
+        return User.Identity?.IsAuthenticated == true &&
+            User.IsInRole(AppRoles.TournamentSupervisor) &&
+            !User.IsInRole(AppRoles.GeneralAdmin);
+    }
 }

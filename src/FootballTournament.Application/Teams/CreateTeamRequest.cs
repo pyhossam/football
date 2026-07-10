@@ -5,6 +5,7 @@ public sealed record CreateTeamRequest(
     string NameEn,
     string ShortName,
     string TeamCode,
+    string? LogoPath,
     string PrimaryColor,
     string SecondaryColor,
     string? City,

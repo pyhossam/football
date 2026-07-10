@@ -18,7 +18,7 @@ public sealed class TournamentsController(ITournamentService tournamentService) 
         [FromQuery] TournamentQuery query,
         CancellationToken cancellationToken)
     {
-        var result = await tournamentService.GetAsync(query, cancellationToken);
+        var result = await tournamentService.GetAsync(query, CurrentUserId(), RestrictToAssignedTournaments(), cancellationToken);
         return Ok(ApiResponse<PagedResult<TournamentDto>>.Ok(result));
     }
 
@@ -26,7 +26,7 @@ public sealed class TournamentsController(ITournamentService tournamentService) 
     [AllowAnonymous]
     public async Task<ActionResult<ApiResponse<TournamentDto>>> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var tournament = await tournamentService.GetByIdAsync(id, cancellationToken);
+        var tournament = await tournamentService.GetByIdAsync(id, CurrentUserId(), RestrictToAssignedTournaments(), cancellationToken);
         return tournament is null
             ? NotFound(ApiResponse<TournamentDto>.Fail("Tournament was not found."))
             : Ok(ApiResponse<TournamentDto>.Ok(tournament));
@@ -63,7 +63,7 @@ public sealed class TournamentsController(ITournamentService tournamentService) 
             return BadRequest(ApiResponse<TournamentDto>.Fail("Validation failed.", validation.ToDictionary()));
         }
 
-        var tournament = await tournamentService.UpdateAsync(id, request, CurrentUserId(), cancellationToken);
+        var tournament = await tournamentService.UpdateAsync(id, request, CurrentUserId(), RestrictToAssignedTournaments(), cancellationToken);
         return tournament is null
             ? NotFound(ApiResponse<TournamentDto>.Fail("Tournament was not found."))
             : Ok(ApiResponse<TournamentDto>.Ok(tournament));
@@ -96,4 +96,11 @@ public sealed class TournamentsController(ITournamentService tournamentService) 
     }
 
     private string? CurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    private bool RestrictToAssignedTournaments()
+    {
+        return User.Identity?.IsAuthenticated == true &&
+            User.IsInRole(AppRoles.TournamentSupervisor) &&
+            !User.IsInRole(AppRoles.GeneralAdmin);
+    }
 }
