@@ -1,7 +1,5 @@
 using FootballTournament.Application.Auth;
 using FootballTournament.Application.Tournaments;
-using FootballTournament.Application.Teams;
-using FootballTournament.Application.Users;
 using FootballTournament.Domain.Constants;
 using FootballTournament.Infrastructure.Identity;
 using FootballTournament.Infrastructure.Persistence;
@@ -65,8 +63,8 @@ public static class DependencyInjection
         services.AddAuthorization(ConfigureAuthorization);
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITournamentService, TournamentService>();
-        services.AddScoped<ITeamService, TeamService>();
-        services.AddScoped<IUserManagementService, UserManagementService>();
+        services.AddApplicationScoped("FootballTournament.Application.Teams.ITeamService", typeof(TeamService));
+        services.AddApplicationScoped("FootballTournament.Application.Users.IUserManagementService", typeof(UserManagementService));
         services.AddScoped<DatabaseSeeder>();
 
         return services;
@@ -77,5 +75,12 @@ public static class DependencyInjection
         options.AddPolicy(AppPolicies.ManagePlatform, policy => policy.RequireRole(AppRoles.GeneralAdmin));
         options.AddPolicy(AppPolicies.ManageTournaments, policy => policy.RequireRole(AppRoles.GeneralAdmin, AppRoles.TournamentSupervisor));
         options.AddPolicy(AppPolicies.ManageTeams, policy => policy.RequireRole(AppRoles.GeneralAdmin, AppRoles.TournamentSupervisor, AppRoles.TeamManager));
+    }
+
+    private static IServiceCollection AddApplicationScoped(this IServiceCollection services, string serviceTypeName, Type implementationType)
+    {
+        var serviceType = Type.GetType($"{serviceTypeName}, FootballTournament.Application", throwOnError: true)!;
+        services.AddScoped(serviceType, implementationType);
+        return services;
     }
 }
